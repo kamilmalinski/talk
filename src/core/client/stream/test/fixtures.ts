@@ -11,7 +11,6 @@ import {
   GQLUser,
   GQLUSER_ROLE,
   GQLUSER_STATUS,
-  GQLSite,
 } from "coral-framework/schema";
 import {
   createFixture,
