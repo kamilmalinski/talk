@@ -23,6 +23,8 @@ import {
   site,
   siteConnection,
   users,
+  site,
+  siteConnection,
 } from "../fixtures";
 
 const viewer = users.admins[0];

@@ -209,6 +209,13 @@ stories-column-site = Site
 site-table-siteName = Site name
 stories-filter-sites = Site
 
+site-selector-all-sites = All sites
+stories-filter-sites-allSites = All sites
+stories-filter-statuses = Status
+stories-column-site = Site
+site-table-siteName = Site name
+stories-filter-sites = Site
+
 ### Email
 
 configure-email = Email settings
