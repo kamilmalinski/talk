@@ -1393,6 +1393,7 @@ type Settings {
   newCommenters: NewCommentersConfiguration! @auth(roles: [ADMIN])
 
   announcement: Announcement
+
   """
   multisite is whether multiple sites exist for this tenant.
   """
