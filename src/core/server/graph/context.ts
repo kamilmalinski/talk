@@ -14,6 +14,7 @@ import { Tenant } from "coral-server/models/tenant";
 import { User } from "coral-server/models/user";
 import { MailerQueue } from "coral-server/queue/tasks/mailer";
 import { NotifierQueue } from "coral-server/queue/tasks/notifier";
+import { RejectorQueue } from "coral-server/queue/tasks/rejector";
 import { ScraperQueue } from "coral-server/queue/tasks/scraper";
 import { I18n } from "coral-server/services/i18n";
 import { JWTSigningConfig } from "coral-server/services/jwt";
@@ -44,6 +45,7 @@ export interface GraphContextOptions {
   notifierQueue: NotifierQueue;
   pubsub: RedisPubSub;
   redis: AugmentedRedis;
+  rejectorQueue: RejectorQueue;
   scraperQueue: ScraperQueue;
   tenant: Tenant;
   tenantCache: TenantCache;
@@ -64,6 +66,7 @@ export default class GraphContext {
   public readonly publisher: Publisher;
   public readonly pubsub: RedisPubSub;
   public readonly redis: AugmentedRedis;
+  public readonly rejectorQueue: RejectorQueue;
   public readonly scraperQueue: ScraperQueue;
   public readonly tenant: Tenant;
   public readonly tenantCache: TenantCache;
@@ -95,8 +98,6 @@ export default class GraphContext {
     this.redis = options.redis;
     this.tenant = options.tenant;
     this.tenantCache = options.tenantCache;
-    this.scraperQueue = options.scraperQueue;
-    this.mailerQueue = options.mailerQueue;
     this.signingConfig = options.signingConfig;
     this.clientID = options.clientID;
 
@@ -112,6 +113,9 @@ export default class GraphContext {
       clientID: this.clientID,
     });
 
+    this.scraperQueue = options.scraperQueue;
+    this.mailerQueue = options.mailerQueue;
+    this.rejectorQueue = options.rejectorQueue;
     this.loaders = loaders(this);
     this.mutators = mutators(this);
   }

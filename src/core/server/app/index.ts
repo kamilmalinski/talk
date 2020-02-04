@@ -18,6 +18,7 @@ import { Config } from "coral-server/config";
 import logger from "coral-server/logger";
 import { MailerQueue } from "coral-server/queue/tasks/mailer";
 import { NotifierQueue } from "coral-server/queue/tasks/notifier";
+import { RejectorQueue } from "coral-server/queue/tasks/rejector";
 import { ScraperQueue } from "coral-server/queue/tasks/scraper";
 import { I18n } from "coral-server/services/i18n";
 import { JWTSigningConfig } from "coral-server/services/jwt";
@@ -52,6 +53,7 @@ export interface AppOptions {
   signingConfig: JWTSigningConfig;
   tenantCache: TenantCache;
   migrationManager: MigrationManager;
+  rejectorQueue: RejectorQueue;
 }
 
 /**

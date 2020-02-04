@@ -18,6 +18,7 @@ export type GraphMiddlewareOptions = Pick<
   | "tenantCache"
   | "metrics"
   | "notifierQueue"
+  | "rejectorQueue"
 >;
 
 export const graphQLHandler = ({

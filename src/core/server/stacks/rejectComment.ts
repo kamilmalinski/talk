@@ -20,7 +20,7 @@ const rejectComment = async (
   mongo: Db,
   redis: AugmentedRedis,
   config: Config,
-  publisher: Publisher,
+  publisher: Publisher | null,
   tenant: Tenant,
   commentID: string,
   commentRevisionID: string,
@@ -46,12 +46,14 @@ const rejectComment = async (
     ...result,
   });
 
-  // Publish changes to the event publisher.
-  await publishChanges(publisher, {
-    ...result,
-    ...counts,
-    moderatorID,
-  });
+  if (publisher) {
+    // Publish changes to the event publisher.
+    await publishChanges(publisher, {
+      ...result,
+      ...counts,
+      moderatorID,
+    });
+  }
 
   // If there was a featured tag on this comment, remove it.
   if (hasTag(result.after, GQLTAG.FEATURED)) {

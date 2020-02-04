@@ -193,6 +193,7 @@ class Server {
       tenantCache: this.tenantCache,
       i18n: this.i18n,
       signingConfig: this.signingConfig,
+      redis: this.redis,
     });
 
     // Create the pubsub client.
@@ -334,6 +335,7 @@ class Server {
       mailerQueue: this.tasks.mailer,
       scraperQueue: this.tasks.scraper,
       notifierQueue: this.tasks.notifier,
+      rejectorQueue: this.tasks.rejector,
       disableClientRoutes,
       persistedQueryCache: this.persistedQueryCache,
       persistedQueriesRequired:
