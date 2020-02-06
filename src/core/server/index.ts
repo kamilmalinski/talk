@@ -234,6 +234,7 @@ class Server {
     this.tasks.mailer.process();
     this.tasks.scraper.process();
     this.tasks.notifier.process();
+    this.tasks.rejector.process();
 
     // Start up the cron job processors.
     this.scheduledTasks = startScheduledTasks({

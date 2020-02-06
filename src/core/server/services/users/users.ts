@@ -5,8 +5,8 @@ import {
   ALLOWED_USERNAME_CHANGE_TIMEFRAME_DURATION,
   COMMENT_REPEAT_POST_DURATION,
   DOWNLOAD_LIMIT_TIMEFRAME_DURATION,
+  SCHEDULED_DELETION_WINDOW_DURATION,
 } from "coral-common/constants";
-import { SCHEDULED_DELETION_WINDOW_DURATION } from "coral-common/constants";
 import { Config } from "coral-server/config";
 import {
   DuplicateEmailError,
@@ -25,10 +25,6 @@ import {
   UsernameUpdatedWithinWindowError,
   UserNotFoundError,
 } from "coral-server/errors";
-import {
-  GQLAuthIntegrations,
-  GQLUSER_ROLE,
-} from "coral-server/graph/schema/__generated__/types";
 import logger from "coral-server/logger";
 import { Comment, retrieveComment } from "coral-server/models/comment";
 import { Tenant } from "coral-server/models/tenant";
@@ -72,12 +68,17 @@ import {
 import {
   getLocalProfile,
   hasLocalProfile,
+  hasStaffRole,
 } from "coral-server/models/user/helpers";
-import { hasStaffRole } from "coral-server/models/user/helpers";
 import { MailerQueue } from "coral-server/queue/tasks/mailer";
+import { RejectorQueue } from "coral-server/queue/tasks/rejector";
+import { JWTSigningConfig, signPATString } from "coral-server/services/jwt";
 import { sendConfirmationEmail } from "coral-server/services/users/auth";
 
-import { JWTSigningConfig, signPATString } from "coral-server/services/jwt";
+import {
+  GQLAuthIntegrations,
+  GQLUSER_ROLE,
+} from "coral-server/graph/schema/__generated__/types";
 
 import { AugmentedRedis } from "../redis";
 import {
@@ -805,19 +806,23 @@ export async function destroyModeratorNote(
  *
  * @param mongo mongo database to interact with
  * @param mailer the mailer
+ * @param rejector the comment rejector queue
  * @param tenant Tenant where the User will be banned on
  * @param banner the User that is banning the User
  * @param userID the ID of the User being banned
  * @param message message to banned user
+ * @param rejectExistingComments whether all the authors previous comments should be rejected
  * @param now the current time that the ban took effect
  */
 export async function ban(
   mongo: Db,
   mailer: MailerQueue,
+  rejector: RejectorQueue,
   tenant: Tenant,
   banner: User,
   userID: string,
   message: string,
+  rejectExistingComments: boolean,
   now = new Date()
 ) {
   // Get the user being banned to check to see if the user already has an
@@ -835,6 +840,17 @@ export async function ban(
 
   // Ban the user.
   const user = await banUser(mongo, tenant.id, userID, banner.id, message, now);
+
+  /* eslint-disable-next-line */
+  console.log(rejectExistingComments);
+
+  if (rejectExistingComments) {
+    await rejector.add({
+      tenantID: tenant.id,
+      authorID: userID,
+      moderatorID: banner.id,
+    });
+  }
 
   // If the user has an email address associated with their account, send them
   // a ban notification email.
